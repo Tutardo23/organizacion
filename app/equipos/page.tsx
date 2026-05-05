@@ -1,285 +1,236 @@
-"use client"; // Necesario para los íconos de Phosphor en Next.js App Router
-
-import { 
-  Users, 
-  UsersThree, 
-  Briefcase, 
-  Files, 
-  MagnifyingGlass, 
-  Plus, 
+import {
+  ArrowRight,
+  Briefcase,
   DotsThree,
   EnvelopeSimple,
-  CaretRight
-} from "@phosphor-icons/react";
+  Export,
+  Files,
+  MagnifyingGlass,
+  Plus,
+  UserPlus,
+} from "@phosphor-icons/react/dist/ssr";
+import { projects, staff, teams } from "../data";
+import { PageHeader, ProgressBar, ToneBadge } from "../components/ui";
+
+const teamTone = {
+  doe: "indigo",
+  directores: "emerald",
+  secretaria: "orange",
+  academico: "blue",
+} as const;
 
 export default function TeamsPage() {
   return (
-    <div className="max-w-[1600px] mx-auto space-y-8 pb-10">
-      
-      {/* Header Section */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-        <div>
-          <h1 className="text-2xl font-bold text-slate-900">Equipos de Trabajo</h1>
-          <p className="text-slate-500 text-sm mt-1">Directorio de departamentos, responsables y carga de proyectos.</p>
-        </div>
-        
-        <div className="flex items-center gap-4">
-          <div className="relative">
-            <MagnifyingGlass size={16} weight="bold" className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" />
-            <input 
-              type="text" 
-              placeholder="Buscar equipo o persona..." 
-              className="pl-9 pr-4 py-2 bg-white border border-slate-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-slate-900 focus:border-transparent w-72 shadow-sm"
-            />
-          </div>
+    <div className="mx-auto max-w-[1600px] space-y-8 pb-10">
+      <PageHeader
+        eyebrow="Mapa de responsabilidades"
+        title="Equipos, referentes y carga de trabajo"
+        description="Un directorio vivo para saber quién lidera cada área, qué proyectos tiene abiertos y dónde conviene reforzar seguimiento."
+      >
+        <button className="flex h-10 items-center gap-2 rounded-lg border border-slate-200 bg-white px-4 text-sm font-bold text-slate-700 shadow-sm transition hover:border-blue-200 hover:text-blue-700">
+          <Export size={18} weight="bold" />
+          Exportar
+        </button>
+        <button className="flex h-10 items-center gap-2 rounded-lg bg-slate-950 px-4 text-sm font-bold text-white shadow-sm transition hover:bg-blue-700">
+          <UserPlus size={18} weight="bold" />
+          Nuevo integrante
+        </button>
+      </PageHeader>
 
-          <button className="flex items-center gap-2 px-4 py-2 bg-slate-900 text-white rounded-lg text-sm font-semibold hover:bg-slate-800 transition-all shadow-sm">
-            <Plus size={16} weight="bold" />
-            Nuevo Equipo
-          </button>
+      <section className="grid grid-cols-1 gap-4 lg:grid-cols-[1fr_auto]">
+        <div className="relative">
+          <MagnifyingGlass size={18} className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" />
+          <input
+            type="search"
+            placeholder="Buscar equipo, persona, cargo o área..."
+            className="h-11 w-full rounded-lg border border-slate-200 bg-white pl-10 pr-4 text-sm font-medium text-slate-700 shadow-sm outline-none transition focus:border-blue-300 focus:ring-2 focus:ring-blue-100"
+          />
         </div>
-      </div>
-
-      {/* Teams Grid */}
-      <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
-        
-        {/* Card: DOE */}
-        <div className="bg-white rounded-xl border border-slate-200 shadow-sm hover:shadow-md hover:border-slate-300 transition-all overflow-hidden flex flex-col">
-          <div className="p-6 border-b border-slate-100 relative">
-            <div className="absolute top-6 right-6">
-              <button className="text-slate-400 hover:text-slate-700 transition-colors">
-                <DotsThree size={24} weight="bold" />
-              </button>
-            </div>
-            <div className="w-12 h-12 bg-indigo-50 text-indigo-600 rounded-lg flex items-center justify-center mb-4 border border-indigo-100">
-              <UsersThree size={24} weight="fill" />
-            </div>
-            <h2 className="text-lg font-bold text-slate-900">Departamento de Orientación (DOE)</h2>
-            <p className="text-sm text-slate-500 mt-1">Seguimiento psicológico y conductual del alumnado.</p>
+        <div className="grid grid-cols-3 gap-3 sm:w-[480px]">
+          <div className="rounded-lg border border-slate-200 bg-white p-3 shadow-sm">
+            <p className="text-xs font-bold uppercase tracking-wide text-slate-400">Equipos</p>
+            <p className="mt-1 text-xl font-extrabold text-slate-950">{teams.length}</p>
           </div>
-          
-          <div className="p-6 bg-slate-50/50 flex-1 flex flex-col gap-5">
-            <div>
-              <span className="text-xs font-semibold text-slate-400 uppercase tracking-wider mb-2 block">Responsable</span>
-              <div className="flex items-center gap-3">
-                <div className="w-8 h-8 rounded-full bg-slate-800 text-white flex items-center justify-center text-xs font-bold">V</div>
-                <div>
-                  <p className="text-sm font-semibold text-slate-900">Lic. Verón</p>
-                  <p className="text-xs text-slate-500">Coordinador Principal</p>
+          <div className="rounded-lg border border-slate-200 bg-white p-3 shadow-sm">
+            <p className="text-xs font-bold uppercase tracking-wide text-slate-400">Personas</p>
+            <p className="mt-1 text-xl font-extrabold text-slate-950">{staff.length}</p>
+          </div>
+          <div className="rounded-lg border border-slate-200 bg-white p-3 shadow-sm">
+            <p className="text-xs font-bold uppercase tracking-wide text-slate-400">Activos</p>
+            <p className="mt-1 text-xl font-extrabold text-blue-700">{projects.filter((project) => project.status !== "Finalizado").length}</p>
+          </div>
+        </div>
+      </section>
+
+      <section className="grid grid-cols-1 gap-5 xl:grid-cols-4">
+        {teams.map((team) => {
+          const Icon = team.icon;
+          const completion = Math.min(96, 52 + team.documents / 2);
+          return (
+            <article key={team.id} className="flex flex-col overflow-hidden rounded-xl border border-slate-200 bg-white shadow-sm transition hover:-translate-y-0.5 hover:shadow-md">
+              <div className="border-b border-slate-100 p-5">
+                <div className="flex items-start justify-between gap-3">
+                  <div className="grid h-12 w-12 place-items-center rounded-lg bg-slate-100 text-slate-700">
+                    <Icon size={25} weight="fill" />
+                  </div>
+                  <button className="text-slate-300 transition hover:text-slate-700">
+                    <DotsThree size={24} weight="bold" />
+                  </button>
+                </div>
+                <div className="mt-5">
+                  <ToneBadge tone={teamTone[team.id as keyof typeof teamTone]}>{team.shortName}</ToneBadge>
+                  <h2 className="mt-3 text-lg font-extrabold leading-tight text-slate-950">{team.name}</h2>
+                  <p className="mt-2 text-sm leading-6 text-slate-500">{team.description}</p>
                 </div>
               </div>
-            </div>
 
-            <div>
-              <span className="text-xs font-semibold text-slate-400 uppercase tracking-wider mb-2 block">Miembros (4)</span>
-              <div className="flex -space-x-2">
-                <div className="w-8 h-8 rounded-full bg-slate-200 border-2 border-white flex items-center justify-center text-xs font-bold text-slate-600">MR</div>
-                <div className="w-8 h-8 rounded-full bg-blue-100 border-2 border-white flex items-center justify-center text-xs font-bold text-blue-600">AL</div>
-                <div className="w-8 h-8 rounded-full bg-emerald-100 border-2 border-white flex items-center justify-center text-xs font-bold text-emerald-600">TJ</div>
-                <button className="w-8 h-8 rounded-full bg-white border-2 border-slate-200 border-dashed flex items-center justify-center text-slate-400 hover:text-slate-700 hover:border-slate-400 transition-colors">
-                  <Plus size={12} weight="bold" />
+              <div className="flex flex-1 flex-col gap-5 bg-slate-50/60 p-5">
+                <div>
+                  <p className="text-xs font-bold uppercase tracking-wide text-slate-400">Responsable</p>
+                  <div className="mt-3 flex items-center gap-3">
+                    <div className="grid h-9 w-9 place-items-center rounded-lg bg-slate-950 text-xs font-extrabold text-white">
+                      {team.lead
+                        .split(" ")
+                        .filter(Boolean)
+                        .slice(-1)[0]
+                        .charAt(0)}
+                    </div>
+                    <div>
+                      <p className="text-sm font-extrabold text-slate-950">{team.lead}</p>
+                      <p className="text-xs font-medium text-slate-500">{team.leadRole}</p>
+                    </div>
+                  </div>
+                </div>
+
+                <div>
+                  <div className="mb-2 flex items-center justify-between text-xs font-bold">
+                    <span className="uppercase tracking-wide text-slate-400">Carga saludable</span>
+                    <span className="text-blue-700">{Math.round(completion)}%</span>
+                  </div>
+                  <ProgressBar value={completion} tone={team.color === "emerald" ? "emerald" : team.color === "orange" ? "orange" : "blue"} />
+                </div>
+
+                <div className="grid grid-cols-2 gap-3">
+                  <div className="rounded-lg border border-slate-200 bg-white p-3">
+                    <Briefcase size={18} weight="fill" className="text-blue-600" />
+                    <p className="mt-2 text-lg font-extrabold text-slate-950">{team.activeProjects}</p>
+                    <p className="text-xs font-bold text-slate-500">Proyectos</p>
+                  </div>
+                  <div className="rounded-lg border border-slate-200 bg-white p-3">
+                    <Files size={18} weight="fill" className="text-emerald-600" />
+                    <p className="mt-2 text-lg font-extrabold text-slate-950">{team.documents}</p>
+                    <p className="text-xs font-bold text-slate-500">Documentos</p>
+                  </div>
+                </div>
+
+                <div>
+                  <p className="text-xs font-bold uppercase tracking-wide text-slate-400">Miembros</p>
+                  <div className="mt-3 flex -space-x-2">
+                    {team.members.slice(0, 4).map((member) => (
+                      <div
+                        key={member}
+                        className="grid h-8 w-8 place-items-center rounded-full border-2 border-white bg-white text-[10px] font-extrabold text-slate-600 shadow-sm ring-1 ring-slate-200"
+                      >
+                        {member}
+                      </div>
+                    ))}
+                    <button className="grid h-8 w-8 place-items-center rounded-full border-2 border-white bg-slate-950 text-white shadow-sm">
+                      <Plus size={12} weight="bold" />
+                    </button>
+                  </div>
+                </div>
+              </div>
+
+              <div className="border-t border-slate-100 bg-white p-4">
+                <button className="flex w-full items-center justify-between rounded-lg px-3 py-2 text-sm font-extrabold text-blue-700 transition hover:bg-blue-50">
+                  Ver tablero del equipo
+                  <ArrowRight size={17} weight="bold" />
                 </button>
               </div>
-            </div>
-          </div>
+            </article>
+          );
+        })}
+      </section>
 
-          <div className="p-4 border-t border-slate-100 flex items-center justify-between bg-white">
-            <div className="flex items-center gap-4 text-sm text-slate-600 font-medium">
-              <div className="flex items-center gap-1.5"><Briefcase size={16} className="text-blue-500" /> 2 Activos</div>
-              <div className="flex items-center gap-1.5"><Files size={16} className="text-emerald-500" /> 14 Informes</div>
+      <section className="grid grid-cols-1 gap-6 xl:grid-cols-[1fr_360px]">
+        <div className="overflow-hidden rounded-xl border border-slate-200 bg-white shadow-sm">
+          <div className="flex items-center justify-between border-b border-slate-100 bg-slate-50/70 p-5">
+            <div>
+              <h2 className="text-lg font-extrabold text-slate-950">Directorio de personal</h2>
+              <p className="mt-1 text-sm font-medium text-slate-500">Contactos y estado de actividad por área.</p>
             </div>
-            <button className="text-blue-600 hover:text-blue-800 text-sm font-semibold flex items-center gap-1">
-              Ver detalle <CaretRight size={14} weight="bold" />
+            <button className="hidden rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm font-bold text-slate-700 shadow-sm transition hover:text-blue-700 sm:block">
+              Exportar lista
             </button>
           </div>
-        </div>
 
-        {/* Card: Directores de Nivel */}
-        <div className="bg-white rounded-xl border border-slate-200 shadow-sm hover:shadow-md hover:border-slate-300 transition-all overflow-hidden flex flex-col">
-          <div className="p-6 border-b border-slate-100 relative">
-            <div className="absolute top-6 right-6">
-              <button className="text-slate-400 hover:text-slate-700 transition-colors">
-                <DotsThree size={24} weight="bold" />
-              </button>
-            </div>
-            <div className="w-12 h-12 bg-emerald-50 text-emerald-600 rounded-lg flex items-center justify-center mb-4 border border-emerald-100">
-              <Briefcase size={24} weight="fill" />
-            </div>
-            <h2 className="text-lg font-bold text-slate-900">Directores de Nivel</h2>
-            <p className="text-sm text-slate-500 mt-1">Gestión académica y articulación entre primaria y secundaria.</p>
-          </div>
-          
-          <div className="p-6 bg-slate-50/50 flex-1 flex flex-col gap-5">
-            <div>
-              <span className="text-xs font-semibold text-slate-400 uppercase tracking-wider mb-2 block">Responsable</span>
-              <div className="flex items-center gap-3">
-                <div className="w-8 h-8 rounded-full bg-emerald-600 text-white flex items-center justify-center text-xs font-bold">G</div>
-                <div>
-                  <p className="text-sm font-semibold text-slate-900">Prof. Gómez</p>
-                  <p className="text-xs text-slate-500">Director General</p>
-                </div>
-              </div>
-            </div>
-
-            <div>
-              <span className="text-xs font-semibold text-slate-400 uppercase tracking-wider mb-2 block">Miembros (3)</span>
-              <div className="flex -space-x-2">
-                <div className="w-8 h-8 rounded-full bg-orange-100 border-2 border-white flex items-center justify-center text-xs font-bold text-orange-600">PT</div>
-                <div className="w-8 h-8 rounded-full bg-pink-100 border-2 border-white flex items-center justify-center text-xs font-bold text-pink-600">RS</div>
-                <button className="w-8 h-8 rounded-full bg-white border-2 border-slate-200 border-dashed flex items-center justify-center text-slate-400 hover:text-slate-700 hover:border-slate-400 transition-colors">
-                  <Plus size={12} weight="bold" />
-                </button>
-              </div>
-            </div>
-          </div>
-
-          <div className="p-4 border-t border-slate-100 flex items-center justify-between bg-white">
-            <div className="flex items-center gap-4 text-sm text-slate-600 font-medium">
-              <div className="flex items-center gap-1.5"><Briefcase size={16} className="text-blue-500" /> 1 Activo</div>
-              <div className="flex items-center gap-1.5"><Files size={16} className="text-emerald-500" /> 38 Informes</div>
-            </div>
-            <button className="text-blue-600 hover:text-blue-800 text-sm font-semibold flex items-center gap-1">
-              Ver detalle <CaretRight size={14} weight="bold" />
-            </button>
+          <div className="overflow-x-auto">
+            <table className="w-full min-w-[760px] text-left">
+              <thead>
+                <tr className="border-b border-slate-200 bg-white text-xs font-bold uppercase tracking-wide text-slate-400">
+                  <th className="px-5 py-4">Nombre</th>
+                  <th className="px-5 py-4">Rol</th>
+                  <th className="px-5 py-4">Equipo</th>
+                  <th className="px-5 py-4">Última actividad</th>
+                  <th className="px-5 py-4">Estado</th>
+                  <th className="px-5 py-4 text-right">Acción</th>
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-slate-100 text-sm">
+                {staff.map((person) => (
+                  <tr key={person.name} className="transition hover:bg-slate-50">
+                    <td className="px-5 py-4">
+                      <div className="flex items-center gap-3">
+                        <div className="grid h-9 w-9 place-items-center rounded-lg bg-slate-950 text-xs font-extrabold text-white">{person.initials}</div>
+                        <span className="font-extrabold text-slate-950">{person.name}</span>
+                      </div>
+                    </td>
+                    <td className="px-5 py-4 font-medium text-slate-600">{person.role}</td>
+                    <td className="px-5 py-4">
+                      <ToneBadge tone={person.team === "DOE" ? "indigo" : person.team === "Dirección" ? "emerald" : person.team === "Secretaría" ? "orange" : "blue"}>
+                        {person.team}
+                      </ToneBadge>
+                    </td>
+                    <td className="px-5 py-4 font-medium text-slate-500">{person.lastActivity}</td>
+                    <td className="px-5 py-4">
+                      <span className="rounded-md bg-slate-100 px-2.5 py-1 text-xs font-bold text-slate-700">{person.status}</span>
+                    </td>
+                    <td className="px-5 py-4 text-right">
+                      <button className="rounded-lg p-2 text-slate-400 transition hover:bg-blue-50 hover:text-blue-700">
+                        <EnvelopeSimple size={18} weight="bold" />
+                      </button>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
           </div>
         </div>
 
-        {/* Card: Administración */}
-        <div className="bg-white rounded-xl border border-slate-200 shadow-sm hover:shadow-md hover:border-slate-300 transition-all overflow-hidden flex flex-col">
-          <div className="p-6 border-b border-slate-100 relative">
-            <div className="absolute top-6 right-6">
-              <button className="text-slate-400 hover:text-slate-700 transition-colors">
-                <DotsThree size={24} weight="bold" />
-              </button>
+        <aside className="rounded-xl border border-slate-200 bg-white p-5 shadow-sm">
+          <h2 className="text-lg font-extrabold text-slate-950">Sugerencias de coordinación</h2>
+          <div className="mt-5 space-y-4">
+            <div className="rounded-lg border border-orange-100 bg-orange-50 p-4">
+              <p className="text-sm font-extrabold text-orange-900">Reforzar dirección esta semana</p>
+              <p className="mt-2 text-sm leading-6 text-orange-800">
+                Hay validaciones acumuladas en articulación y seguimiento trimestral. Conviene reservar un bloque de revisión.
+              </p>
             </div>
-            <div className="w-12 h-12 bg-orange-50 text-orange-600 rounded-lg flex items-center justify-center mb-4 border border-orange-100">
-              <Files size={24} weight="fill" />
+            <div className="rounded-lg border border-blue-100 bg-blue-50 p-4">
+              <p className="text-sm font-extrabold text-blue-900">Unificar criterios de carga</p>
+              <p className="mt-2 text-sm leading-6 text-blue-800">
+                DOE y Secretaría cargan documentos similares. Un formulario común bajaría errores y duplicación.
+              </p>
             </div>
-            <h2 className="text-lg font-bold text-slate-900">Administración y Secretaría</h2>
-            <p className="text-sm text-slate-500 mt-1">Control de legajos, asistencia docente y documentación legal.</p>
-          </div>
-          
-          <div className="p-6 bg-slate-50/50 flex-1 flex flex-col gap-5">
-            <div>
-              <span className="text-xs font-semibold text-slate-400 uppercase tracking-wider mb-2 block">Responsable</span>
-              <div className="flex items-center gap-3">
-                <div className="w-8 h-8 rounded-full bg-slate-300 text-slate-800 flex items-center justify-center text-xs font-bold">LC</div>
-                <div>
-                  <p className="text-sm font-semibold text-slate-900">Lucía Casares</p>
-                  <p className="text-xs text-slate-500">Jefa de Secretaría</p>
-                </div>
-              </div>
-            </div>
-
-            <div>
-              <span className="text-xs font-semibold text-slate-400 uppercase tracking-wider mb-2 block">Miembros (5)</span>
-              <div className="flex -space-x-2">
-                <div className="w-8 h-8 rounded-full bg-slate-200 border-2 border-white flex items-center justify-center text-xs font-bold text-slate-600">AB</div>
-                <div className="w-8 h-8 rounded-full bg-slate-200 border-2 border-white flex items-center justify-center text-xs font-bold text-slate-600">CD</div>
-                <div className="w-8 h-8 rounded-full bg-slate-200 border-2 border-white flex items-center justify-center text-xs font-bold text-slate-600">EF</div>
-                <div className="w-8 h-8 rounded-full bg-slate-100 border-2 border-white flex items-center justify-center text-[10px] font-bold text-slate-500">+2</div>
-              </div>
+            <div className="rounded-lg border border-emerald-100 bg-emerald-50 p-4">
+              <p className="text-sm font-extrabold text-emerald-900">Buen ritmo documental</p>
+              <p className="mt-2 text-sm leading-6 text-emerald-800">
+                La documentación crítica está cerca del objetivo. Mantener responsables visibles ayuda a sostenerlo.
+              </p>
             </div>
           </div>
-
-          <div className="p-4 border-t border-slate-100 flex items-center justify-between bg-white">
-            <div className="flex items-center gap-4 text-sm text-slate-600 font-medium">
-              <div className="flex items-center gap-1.5"><Briefcase size={16} className="text-blue-500" /> 3 Activos</div>
-              <div className="flex items-center gap-1.5"><Files size={16} className="text-emerald-500" /> 102 Informes</div>
-            </div>
-            <button className="text-blue-600 hover:text-blue-800 text-sm font-semibold flex items-center gap-1">
-              Ver detalle <CaretRight size={14} weight="bold" />
-            </button>
-          </div>
-        </div>
-
-      </div>
-
-      {/* Directory Table */}
-      <div className="bg-white rounded-xl border border-slate-200 shadow-sm overflow-hidden mt-8">
-        <div className="p-6 border-b border-slate-100 flex items-center justify-between">
-          <h2 className="text-lg font-semibold text-slate-900">Directorio de Personal</h2>
-          <button className="text-sm font-medium text-slate-600 hover:text-slate-900 flex items-center gap-2 border border-slate-200 px-3 py-1.5 rounded-lg">
-            <Users size={16} /> Exportar Lista
-          </button>
-        </div>
-        
-        <div className="overflow-x-auto">
-          <table className="w-full text-left border-collapse">
-            <thead>
-              <tr className="bg-slate-50 border-b border-slate-200 text-xs uppercase tracking-wider text-slate-500 font-semibold">
-                <th className="p-4 pl-6">Nombre</th>
-                <th className="p-4">Rol / Cargo</th>
-                <th className="p-4">Equipo</th>
-                <th className="p-4">Última Actividad</th>
-                <th className="p-4 text-right pr-6">Acciones</th>
-              </tr>
-            </thead>
-            <tbody className="text-sm">
-              {/* Fila 1 */}
-              <tr className="border-b border-slate-100 hover:bg-slate-50 transition-colors">
-                <td className="p-4 pl-6">
-                  <div className="flex items-center gap-3">
-                    <div className="w-8 h-8 rounded-full bg-slate-800 text-white flex items-center justify-center text-xs font-bold">V</div>
-                    <span className="font-semibold text-slate-900">Lic. Verón</span>
-                  </div>
-                </td>
-                <td className="p-4 text-slate-600">Coordinador Principal</td>
-                <td className="p-4">
-                  <span className="px-2.5 py-1 rounded-full bg-indigo-50 text-indigo-700 font-medium text-xs">DOE</span>
-                </td>
-                <td className="p-4 text-slate-500">Hoy, 11:30 AM</td>
-                <td className="p-4 text-right pr-6">
-                  <button className="text-slate-400 hover:text-blue-600 transition-colors p-1.5">
-                    <EnvelopeSimple size={18} />
-                  </button>
-                </td>
-              </tr>
-              
-              {/* Fila 2 */}
-              <tr className="border-b border-slate-100 hover:bg-slate-50 transition-colors">
-                <td className="p-4 pl-6">
-                  <div className="flex items-center gap-3">
-                    <div className="w-8 h-8 rounded-full bg-emerald-600 text-white flex items-center justify-center text-xs font-bold">G</div>
-                    <span className="font-semibold text-slate-900">Prof. Gómez</span>
-                  </div>
-                </td>
-                <td className="p-4 text-slate-600">Director General</td>
-                <td className="p-4">
-                  <span className="px-2.5 py-1 rounded-full bg-emerald-50 text-emerald-700 font-medium text-xs">Directores</span>
-                </td>
-                <td className="p-4 text-slate-500">Ayer, 16:45 PM</td>
-                <td className="p-4 text-right pr-6">
-                  <button className="text-slate-400 hover:text-blue-600 transition-colors p-1.5">
-                    <EnvelopeSimple size={18} />
-                  </button>
-                </td>
-              </tr>
-
-               {/* Fila 3 */}
-               <tr className="border-b border-slate-100 hover:bg-slate-50 transition-colors">
-                <td className="p-4 pl-6">
-                  <div className="flex items-center gap-3">
-                    <div className="w-8 h-8 rounded-full bg-slate-200 text-slate-700 flex items-center justify-center text-xs font-bold">MR</div>
-                    <span className="font-semibold text-slate-900">Martín Rivas</span>
-                  </div>
-                </td>
-                <td className="p-4 text-slate-600">Psicopedagogo</td>
-                <td className="p-4">
-                  <span className="px-2.5 py-1 rounded-full bg-indigo-50 text-indigo-700 font-medium text-xs">DOE</span>
-                </td>
-                <td className="p-4 text-slate-500">28 Abr 2026</td>
-                <td className="p-4 text-right pr-6">
-                  <button className="text-slate-400 hover:text-blue-600 transition-colors p-1.5">
-                    <EnvelopeSimple size={18} />
-                  </button>
-                </td>
-              </tr>
-            </tbody>
-          </table>
-        </div>
-      </div>
-
+        </aside>
+      </section>
     </div>
   );
 }

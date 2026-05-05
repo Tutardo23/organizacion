@@ -1,36 +1,52 @@
 @import "tailwindcss";
 
 :root {
-  /* Forzamos los colores de la paleta clara (slate-50 para fondo, slate-900 para texto) */
-  --background: #f8fafc; 
+  --background: #f8fafc;
   --foreground: #0f172a;
 }
 
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+  --font-sans: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  --font-mono: "SFMono-Regular", Consolas, "Liberation Mono", monospace;
 }
 
-/* Se elimina el bloque @media (prefers-color-scheme: dark) 
-  para evitar que el sistema operativo rompa el diseño forzando 
-  un fondo oscuro sobre las tarjetas blancas (bg-white) que ya definimos.
-*/
+* {
+  box-sizing: border-box;
+}
+
+html {
+  background: var(--background);
+}
 
 body {
   background: var(--background);
   color: var(--foreground);
-  /* Mantenemos una tipografía limpia y moderna */
-  font-family: var(--font-sans), Arial, Helvetica, sans-serif;
+  font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
 
-/* Opcional: Estilos para suavizar la barra de scroll y mantener lo estético */
+button,
+input,
+select,
+textarea {
+  font: inherit;
+}
+
+button {
+  cursor: pointer;
+}
+
+::selection {
+  background: #bfdbfe;
+  color: #0f172a;
+}
+
 ::-webkit-scrollbar {
-  width: 8px;
-  height: 8px;
+  width: 10px;
+  height: 10px;
 }
 
 ::-webkit-scrollbar-track {
@@ -39,9 +55,13 @@ body {
 
 ::-webkit-scrollbar-thumb {
   background: #cbd5e1;
-  border-radius: 4px;
+  border: 3px solid transparent;
+  border-radius: 999px;
+  background-clip: content-box;
 }
 
 ::-webkit-scrollbar-thumb:hover {
   background: #94a3b8;
+  border: 3px solid transparent;
+  background-clip: content-box;
 }

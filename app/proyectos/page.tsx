@@ -1,243 +1,178 @@
-"use client";
-
-import { 
-  Plus, 
-  MagnifyingGlass, 
-  SquaresFour, 
-  CalendarBlank, 
-  DotsThree, 
-  Paperclip, 
-  Clock, 
+import {
+  CalendarBlank,
+  ChatCircleText,
   CheckCircle,
+  Clock,
+  DotsThree,
+  FunnelSimple,
+  MagnifyingGlass,
+  Paperclip,
+  Plus,
+  SquaresFour,
   WarningCircle,
-  ChatCircleText
-} from "@phosphor-icons/react";
+} from "@phosphor-icons/react/dist/ssr";
+import type { ProjectStatus } from "../data";
+import { projects } from "../data";
+import { PageHeader, ProgressBar, ToneBadge } from "../components/ui";
+
+const columns: ProjectStatus[] = ["Por hacer", "En curso", "En revisión", "Finalizado"];
+
+const columnTone = {
+  "Por hacer": "slate",
+  "En curso": "blue",
+  "En revisión": "orange",
+  Finalizado: "emerald",
+} as const;
+
+const riskTone = {
+  Normal: "slate",
+  Atención: "orange",
+  Crítico: "rose",
+} as const;
 
 export default function ProjectsPage() {
   return (
-    <div className="max-w-[1600px] mx-auto h-full flex flex-col space-y-6 pb-10">
-      
-      {/* Header & Controls */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-        <div>
-          <h1 className="text-2xl font-bold text-slate-900 tracking-tight">Tablero de Proyectos y Cargas</h1>
-          <p className="text-slate-500 text-sm mt-1">Gestiona el flujo de trabajo de los distintos departamentos y la documentación.</p>
-        </div>
-        
-        <div className="flex items-center gap-4">
-          {/* View Toggles */}
-          <div className="flex items-center bg-slate-100 p-1.5 rounded-lg border border-slate-200">
-            <button className="flex items-center gap-2 px-3 py-1.5 bg-white shadow-sm text-slate-900 rounded-md text-sm font-semibold transition-all">
-              <SquaresFour size={18} weight="bold" />
-              Tablero
-            </button>
-            <button className="flex items-center gap-2 px-3 py-1.5 text-slate-500 hover:text-slate-900 rounded-md text-sm font-medium transition-all">
-              <CalendarBlank size={18} weight="bold" />
-              Calendario
-            </button>
-          </div>
-
-          <div className="h-8 w-px bg-slate-200 hidden sm:block"></div>
-
-          {/* Search */}
-          <div className="relative hidden md:block">
-            <MagnifyingGlass size={16} weight="bold" className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" />
-            <input 
-              type="text" 
-              placeholder="Buscar proyecto o informe..." 
-              className="pl-9 pr-4 py-2 bg-white border border-slate-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 w-64 shadow-sm"
-            />
-          </div>
-
-          <button className="flex items-center gap-2 px-4 py-2.5 bg-slate-900 text-white rounded-lg text-sm font-semibold hover:bg-slate-800 transition-all shadow-sm">
-            <Plus size={16} weight="bold" />
-            Nuevo Proyecto
+    <div className="mx-auto flex h-full max-w-[1600px] flex-col gap-6 pb-8">
+      <PageHeader
+        eyebrow="Flujo de trabajo"
+        title="Proyectos, cargas y validaciones"
+        description="Vista operativa para entender dónde está cada iniciativa, qué documentación tiene, quién responde y qué decisión falta."
+      >
+        <div className="flex items-center rounded-lg border border-slate-200 bg-white p-1 shadow-sm">
+          <button className="flex h-8 items-center gap-2 rounded-md bg-slate-950 px-3 text-sm font-bold text-white">
+            <SquaresFour size={17} weight="bold" />
+            Tablero
+          </button>
+          <button className="flex h-8 items-center gap-2 rounded-md px-3 text-sm font-bold text-slate-500 transition hover:text-slate-900">
+            <CalendarBlank size={17} weight="bold" />
+            Calendario
           </button>
         </div>
-      </div>
+        <button className="flex h-10 items-center gap-2 rounded-lg border border-slate-200 bg-white px-4 text-sm font-bold text-slate-700 shadow-sm transition hover:border-blue-200 hover:text-blue-700">
+          <FunnelSimple size={18} weight="bold" />
+          Filtros
+        </button>
+        <button className="flex h-10 items-center gap-2 rounded-lg bg-slate-950 px-4 text-sm font-bold text-white shadow-sm transition hover:bg-blue-700">
+          <Plus size={18} weight="bold" />
+          Nuevo proyecto
+        </button>
+      </PageHeader>
 
-      {/* Kanban Board Layout */}
-      <div className="flex-1 flex gap-6 overflow-x-auto pb-6 pt-2 snap-x">
-        
-        {/* Columna: Por Hacer */}
-        <div className="w-[320px] flex-shrink-0 flex flex-col snap-start">
-          <div className="flex items-center justify-between mb-4 px-1">
-            <div className="flex items-center gap-2">
-              <div className="w-3 h-3 rounded-full bg-slate-300 border-2 border-slate-100 shadow-sm"></div>
-              <h3 className="font-bold text-slate-700">Por Hacer</h3>
-              <span className="text-xs font-bold bg-slate-200 text-slate-600 px-2.5 py-0.5 rounded-full">1</span>
-            </div>
-            <button className="text-slate-400 hover:text-slate-700 bg-slate-100 hover:bg-slate-200 p-1 rounded-md transition-colors"><Plus size={18} weight="bold"/></button>
+      <section className="grid grid-cols-1 gap-4 lg:grid-cols-[1fr_auto]">
+        <div className="relative">
+          <MagnifyingGlass size={18} className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" />
+          <input
+            type="search"
+            placeholder="Buscar por proyecto, equipo, responsable o próxima acción..."
+            className="h-11 w-full rounded-lg border border-slate-200 bg-white pl-10 pr-4 text-sm font-medium text-slate-700 shadow-sm outline-none transition focus:border-blue-300 focus:ring-2 focus:ring-blue-100"
+          />
+        </div>
+        <div className="grid grid-cols-3 gap-3 sm:w-[520px]">
+          <div className="rounded-lg border border-slate-200 bg-white p-3 shadow-sm">
+            <p className="text-xs font-bold uppercase tracking-wide text-slate-400">A tiempo</p>
+            <p className="mt-1 text-xl font-extrabold text-emerald-600">8</p>
           </div>
-          
-          <div className="flex flex-col gap-4">
-            {/* Tarjeta */}
-            <div className="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm hover:shadow-md hover:border-slate-300 transition-all cursor-grab active:cursor-grabbing group">
-              <div className="flex justify-between items-start mb-3">
-                <span className="text-[10px] font-bold px-2.5 py-1 bg-pink-50 text-pink-700 rounded-md uppercase tracking-wider border border-pink-100">
-                  Tutorías
-                </span>
-                <button className="text-slate-300 hover:text-slate-700 opacity-0 group-hover:opacity-100 transition-opacity"><DotsThree size={24} weight="bold"/></button>
-              </div>
-              <h4 className="font-bold text-slate-900 mb-2 leading-tight text-[15px]">Planificación Taller ESI</h4>
-              <p className="text-sm text-slate-500 mb-5 line-clamp-2 leading-relaxed">Definir temarios e informes históricos a cargar para las charlas de 4to y 5to año.</p>
-              
-              <div className="flex items-center justify-between pt-3.5 border-t border-slate-100">
-                <div className="flex items-center gap-3 text-slate-500 text-xs font-semibold">
-                  <div className="flex items-center gap-1.5"><Clock size={16} weight="bold" /> 15 May</div>
-                </div>
-                <div className="w-7 h-7 rounded-full bg-pink-100 border-2 border-white flex items-center justify-center text-[10px] font-bold text-pink-700 shadow-sm">SJ</div>
-              </div>
-            </div>
+          <div className="rounded-lg border border-slate-200 bg-white p-3 shadow-sm">
+            <p className="text-xs font-bold uppercase tracking-wide text-slate-400">En alerta</p>
+            <p className="mt-1 text-xl font-extrabold text-orange-600">3</p>
+          </div>
+          <div className="rounded-lg border border-slate-200 bg-white p-3 shadow-sm">
+            <p className="text-xs font-bold uppercase tracking-wide text-slate-400">Bloqueados</p>
+            <p className="mt-1 text-xl font-extrabold text-rose-600">1</p>
           </div>
         </div>
+      </section>
 
-        {/* Columna: En Curso */}
-        <div className="w-[320px] flex-shrink-0 flex flex-col snap-start">
-          <div className="flex items-center justify-between mb-4 px-1">
-            <div className="flex items-center gap-2">
-              <div className="w-3 h-3 rounded-full bg-blue-500 border-2 border-blue-100 shadow-sm"></div>
-              <h3 className="font-bold text-slate-700">En Curso</h3>
-              <span className="text-xs font-bold bg-blue-50 text-blue-600 px-2.5 py-0.5 rounded-full border border-blue-100">2</span>
-            </div>
-            <button className="text-slate-400 hover:text-slate-700 bg-slate-100 hover:bg-slate-200 p-1 rounded-md transition-colors"><Plus size={18} weight="bold"/></button>
-          </div>
-          
-          <div className="flex flex-col gap-4">
-            {/* Tarjeta 1 */}
-            <div className="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm hover:shadow-md hover:border-blue-200 transition-all cursor-grab group">
-              <div className="flex justify-between items-start mb-3">
-                <span className="text-[10px] font-bold px-2.5 py-1 bg-indigo-50 text-indigo-700 rounded-md uppercase tracking-wider border border-indigo-100">
-                  DOE
-                </span>
-                <button className="text-slate-300 hover:text-slate-700 opacity-0 group-hover:opacity-100 transition-opacity"><DotsThree size={24} weight="bold"/></button>
+      <section className="flex flex-1 gap-5 overflow-x-auto pb-4">
+        {columns.map((column) => {
+          const columnProjects = projects.filter((project) => project.status === column);
+          return (
+            <div key={column} className="flex w-[340px] shrink-0 flex-col">
+              <div className="mb-3 flex items-center justify-between px-1">
+                <div className="flex items-center gap-2">
+                  <span
+                    className={`h-3 w-3 rounded-full ${
+                      column === "En curso"
+                        ? "bg-blue-500"
+                        : column === "En revisión"
+                          ? "bg-orange-400"
+                          : column === "Finalizado"
+                            ? "bg-emerald-500"
+                            : "bg-slate-300"
+                    }`}
+                  />
+                  <h2 className="font-extrabold text-slate-800">{column}</h2>
+                  <span className="rounded-full bg-white px-2.5 py-0.5 text-xs font-extrabold text-slate-500 shadow-sm ring-1 ring-slate-200">
+                    {columnProjects.length}
+                  </span>
+                </div>
+                <button className="grid h-8 w-8 place-items-center rounded-lg bg-white text-slate-400 shadow-sm ring-1 ring-slate-200 transition hover:text-blue-700">
+                  <Plus size={17} weight="bold" />
+                </button>
               </div>
-              <h4 className="font-bold text-slate-900 mb-1 leading-tight text-[15px]">Seguimiento Conductual 3A</h4>
-              
-              <div className="mt-4 mb-5">
-                <div className="flex justify-between text-xs font-bold mb-2">
-                  <span className="text-slate-500">Carga de informes</span>
-                  <span className="text-blue-600">65%</span>
-                </div>
-                <div className="w-full bg-slate-100 rounded-full h-2">
-                  <div className="bg-blue-500 h-2 rounded-full" style={{ width: '65%' }}></div>
-                </div>
-              </div>
-              
-              <div className="flex items-center justify-between pt-3.5 border-t border-slate-100">
-                <div className="flex items-center gap-3 text-slate-500 text-xs font-semibold">
-                  <div className="flex items-center gap-1.5 text-orange-500 bg-orange-50 px-2 py-1 rounded"><Clock size={16} weight="bold" /> 3 días</div>
-                  <div className="flex items-center gap-1.5"><Paperclip size={16} weight="bold" /> 14</div>
-                </div>
-                <div className="flex -space-x-2">
-                  <div className="w-7 h-7 rounded-full bg-slate-800 border-2 border-white flex items-center justify-center text-[10px] font-bold text-white shadow-sm">V</div>
-                  <div className="w-7 h-7 rounded-full bg-slate-200 border-2 border-white flex items-center justify-center text-[10px] font-bold text-slate-600 shadow-sm">M</div>
-                </div>
-              </div>
-            </div>
 
-            {/* Tarjeta 2 */}
-            <div className="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm hover:shadow-md hover:border-blue-200 transition-all cursor-grab group">
-              <div className="flex justify-between items-start mb-3">
-                <span className="text-[10px] font-bold px-2.5 py-1 bg-slate-100 text-slate-700 rounded-md uppercase tracking-wider border border-slate-200">
-                  Administración
-                </span>
-                <button className="text-slate-300 hover:text-slate-700 opacity-0 group-hover:opacity-100 transition-opacity"><DotsThree size={24} weight="bold"/></button>
-              </div>
-              <h4 className="font-bold text-slate-900 mb-1 leading-tight text-[15px]">Auditoría Histórica de Legajos</h4>
-              
-              <div className="mt-4 mb-5">
-                <div className="flex justify-between text-xs font-bold mb-2">
-                  <span className="text-slate-500">Revisión de planillas</span>
-                  <span className="text-blue-600">30%</span>
-                </div>
-                <div className="w-full bg-slate-100 rounded-full h-2">
-                  <div className="bg-blue-500 h-2 rounded-full" style={{ width: '30%' }}></div>
-                </div>
-              </div>
-              
-              <div className="flex items-center justify-between pt-3.5 border-t border-slate-100">
-                <div className="flex items-center gap-3 text-slate-500 text-xs font-semibold">
-                  <div className="flex items-center gap-1.5"><Clock size={16} weight="bold" /> 20 May</div>
-                </div>
-                <div className="w-7 h-7 rounded-full bg-orange-100 border-2 border-white flex items-center justify-center text-[10px] font-bold text-orange-700 shadow-sm">LC</div>
-              </div>
-            </div>
-          </div>
-        </div>
+              <div className="flex flex-col gap-4">
+                {columnProjects.map((project) => (
+                  <article
+                    key={project.id}
+                    className={`rounded-xl border bg-white p-5 shadow-sm transition hover:-translate-y-0.5 hover:shadow-md ${
+                      project.risk === "Crítico" ? "border-orange-200 bg-orange-50/40" : "border-slate-200"
+                    }`}
+                  >
+                    <div className="flex items-start justify-between gap-3">
+                      <div className="flex flex-wrap items-center gap-2">
+                        <ToneBadge tone={columnTone[column]}>{project.team}</ToneBadge>
+                        <ToneBadge tone={riskTone[project.risk]}>{project.risk}</ToneBadge>
+                      </div>
+                      <button className="text-slate-300 transition hover:text-slate-700">
+                        <DotsThree size={24} weight="bold" />
+                      </button>
+                    </div>
 
-        {/* Columna: En Revisión (RESTABLECIDA) */}
-        <div className="w-[320px] flex-shrink-0 flex flex-col snap-start">
-          <div className="flex items-center justify-between mb-4 px-1">
-            <div className="flex items-center gap-2">
-              <div className="w-3 h-3 rounded-full bg-orange-400 border-2 border-orange-100 shadow-sm"></div>
-              <h3 className="font-bold text-slate-700">En Revisión</h3>
-              <span className="text-xs font-bold bg-orange-50 text-orange-600 px-2.5 py-0.5 rounded-full border border-orange-100">1</span>
-            </div>
-            <button className="text-slate-400 hover:text-slate-700 bg-slate-100 hover:bg-slate-200 p-1 rounded-md transition-colors"><Plus size={18} weight="bold"/></button>
-          </div>
-          
-          <div className="flex flex-col gap-4">
-            {/* Tarjeta de Revisión (Con diseño de alerta) */}
-            <div className="bg-orange-50/50 p-5 rounded-2xl border border-orange-200 shadow-sm hover:shadow-md hover:border-orange-300 transition-all cursor-grab group">
-              <div className="flex justify-between items-start mb-3">
-                <span className="text-[10px] font-bold px-2.5 py-1 bg-emerald-100 text-emerald-800 rounded-md uppercase tracking-wider border border-emerald-200">
-                  Directores
-                </span>
-                <button className="text-orange-300 hover:text-orange-700 opacity-0 group-hover:opacity-100 transition-opacity"><DotsThree size={24} weight="bold"/></button>
-              </div>
-              <h4 className="font-bold text-slate-900 mb-2 leading-tight text-[15px]">Articulación Primaria - Secundaria</h4>
-              
-              <div className="bg-white p-3 rounded-lg border border-orange-100 mb-5 flex items-start gap-2">
-                <WarningCircle size={18} weight="fill" className="text-orange-500 mt-0.5 flex-shrink-0" />
-                <p className="text-xs text-orange-800 font-medium leading-relaxed">
-                  Esperando validación de la Dirección General sobre los informes del primer trimestre.
-                </p>
-              </div>
-              
-              <div className="flex items-center justify-between pt-3.5 border-t border-orange-200/60">
-                <div className="flex items-center gap-3 text-orange-700 text-xs font-semibold">
-                  <div className="flex items-center gap-1.5"><Paperclip size={16} weight="bold" /> 8 actas</div>
-                  <div className="flex items-center gap-1.5"><ChatCircleText size={16} weight="fill" /> 2</div>
-                </div>
-                <div className="w-7 h-7 rounded-full bg-slate-800 border-2 border-white flex items-center justify-center text-[10px] font-bold text-white shadow-sm">G</div>
-              </div>
-            </div>
-          </div>
-        </div>
+                    <h3 className="mt-4 text-base font-extrabold leading-tight text-slate-950">{project.title}</h3>
+                    <p className="mt-2 line-clamp-2 text-sm leading-6 text-slate-500">{project.summary}</p>
 
-        {/* Columna: Finalizado */}
-        <div className="w-[320px] flex-shrink-0 flex flex-col snap-start">
-          <div className="flex items-center justify-between mb-4 px-1">
-            <div className="flex items-center gap-2">
-              <div className="w-3 h-3 rounded-full bg-emerald-500 border-2 border-emerald-100 shadow-sm"></div>
-              <h3 className="font-bold text-slate-700">Finalizado</h3>
-              <span className="text-xs font-bold bg-emerald-50 text-emerald-600 px-2.5 py-0.5 rounded-full border border-emerald-100">1</span>
-            </div>
-            <button className="text-slate-400 hover:text-slate-700 bg-slate-100 hover:bg-slate-200 p-1 rounded-md transition-colors"><DotsThree size={24} weight="bold"/></button>
-          </div>
-          
-          <div className="flex flex-col gap-4">
-            {/* Tarjeta Finalizada */}
-            <div className="bg-slate-50 p-5 rounded-2xl border border-slate-200 shadow-sm opacity-80 hover:opacity-100 transition-opacity cursor-grab group">
-              <div className="flex justify-between items-start mb-3">
-                <span className="text-[10px] font-bold px-2.5 py-1 bg-slate-200 text-slate-700 rounded-md uppercase tracking-wider border border-slate-300">
-                  Académico
-                </span>
-                <CheckCircle size={22} weight="fill" className="text-emerald-500"/>
-              </div>
-              <h4 className="font-bold text-slate-900 mb-1 leading-tight text-[15px] line-through decoration-slate-400 decoration-2">Carga Histórica Trimestre 1</h4>
-              
-              <div className="flex items-center justify-between pt-3.5 mt-5 border-t border-slate-200">
-                <div className="flex items-center gap-2 text-slate-500 text-xs font-semibold">
-                  <CheckCircle size={14} weight="bold" /> Completado el 28 Abr
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
+                    {project.status === "En revisión" ? (
+                      <div className="mt-4 flex items-start gap-2 rounded-lg border border-orange-100 bg-white p-3">
+                        <WarningCircle size={18} weight="fill" className="mt-0.5 shrink-0 text-orange-500" />
+                        <p className="text-xs font-bold leading-5 text-orange-800">{project.nextAction}</p>
+                      </div>
+                    ) : null}
 
-      </div>
+                    <div className="mt-5">
+                      <div className="mb-2 flex items-center justify-between text-xs font-bold">
+                        <span className="text-slate-500">Avance documental</span>
+                        <span className={project.status === "Finalizado" ? "text-emerald-600" : "text-blue-700"}>{project.progress}%</span>
+                      </div>
+                      <ProgressBar value={project.progress} tone={project.status === "Finalizado" ? "emerald" : project.risk === "Crítico" ? "orange" : "blue"} />
+                    </div>
+
+                    <div className="mt-5 flex items-center justify-between border-t border-slate-100 pt-4">
+                      <div className="flex items-center gap-2 text-xs font-bold text-slate-500">
+                        {project.status === "Finalizado" ? <CheckCircle size={16} weight="fill" className="text-emerald-500" /> : <Clock size={16} weight="bold" className="text-orange-500" />}
+                        {project.status === "Finalizado" ? `Completado ${project.due}` : `${project.daysLeft} días`}
+                      </div>
+                      <div className="flex items-center gap-3 text-xs font-bold text-slate-500">
+                        <span className="flex items-center gap-1">
+                          <Paperclip size={16} weight="bold" /> {project.docs}
+                        </span>
+                        <span className="flex items-center gap-1">
+                          <ChatCircleText size={16} weight="bold" /> {project.comments}
+                        </span>
+                      </div>
+                    </div>
+
+                    <div className="mt-4 flex items-center justify-between rounded-lg bg-slate-50 px-3 py-2">
+                      <span className="text-xs font-bold uppercase tracking-wide text-slate-400">Responsable</span>
+                      <span className="text-xs font-extrabold text-slate-800">{project.owner}</span>
+                    </div>
+                  </article>
+                ))}
+              </div>
+            </div>
+          );
+        })}
+      </section>
     </div>
   );
 }
