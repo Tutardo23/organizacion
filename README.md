@@ -1,36 +1,112 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Pucará Gestión Institucional
 
-## Getting Started
+## Estado actual (Fase 1 + Fase 2 funcional)
 
-First, run the development server:
+La app ahora incluye backend operativo con API routes para:
+- Proyectos (`GET/POST /api/projects`, `PATCH /api/projects/:id`)
+- Eventos (`GET/POST /api/events`)
+- Documentos (`GET/POST /api/documents`)
+- Métricas por perfil (`GET /api/dashboard`)
 
+Los datos se persisten en `data/runtime-store.json` automáticamente (sin depender de servicios externos).
+
+## Perfiles soportados
+- Secretaría
+- Dirección
+- DOE
+- Académico
+
+## Probar flujo real rápido
+1. Levantar app: `npm run dev`
+2. Crear proyecto:
 ```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+curl -X POST http://localhost:3000/api/projects \
+  -H 'content-type: application/json' \
+  -d '{"title":"Seguimiento Inasistencias 2B","team":"DOE","owner":"Lic. Verón","dueDate":"2026-06-07","summary":"Seguimiento de casos","nextAction":"Convocar reunión"}'
+```
+3. Ver proyectos por perfil:
+```bash
+curl 'http://localhost:3000/api/projects?profile=DOE'
+```
+4. Crear documento:
+```bash
+curl -X POST http://localhost:3000/api/documents \
+  -H 'content-type: application/json' \
+  -d '{"projectId":"<ID_PROYECTO>","name":"Acta reunión familia","uploadedBy":"Secretaría","team":"DOE"}'
+```
+5. Métricas:
+```bash
+curl 'http://localhost:3000/api/dashboard?profile=DOE'
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+---
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+## Cómo conectarlo a Neon (PostgreSQL)
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+### Variables de entorno
+Crear `.env.local` con:
+```env
+DATABASE_URL=postgresql://<user>:<password>@<host>/<db>?sslmode=require
+```
 
-## Learn More
+### Esquema recomendado en Neon
+```sql
+create table teams (
+  id text primary key,
+  name text not null,
+  short_name text not null unique
+);
 
-To learn more about Next.js, take a look at the following resources:
+create table projects (
+  id text primary key,
+  title text not null,
+  team text not null references teams(short_name),
+  owner text not null,
+  status text not null,
+  risk text not null,
+  progress int not null default 0,
+  due_date date not null,
+  docs int not null default 0,
+  comments int not null default 0,
+  priority text not null,
+  summary text not null,
+  next_action text not null,
+  created_at timestamptz not null default now(),
+  updated_at timestamptz not null default now()
+);
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+create table events (
+  id text primary key,
+  title text not null,
+  team text not null references teams(short_name),
+  starts_at timestamptz not null,
+  type text not null
+);
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+create table documents (
+  id text primary key,
+  project_id text not null references projects(id) on delete cascade,
+  team text not null references teams(short_name),
+  name text not null,
+  type text not null,
+  date date not null,
+  uploaded_by text not null
+);
 
-## Deploy on Vercel
+create table audit_log (
+  id text primary key,
+  action text not null,
+  actor text not null,
+  at timestamptz not null default now(),
+  entity text not null,
+  entity_id text not null
+);
+```
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+### Qué cargar inicialmente
+- 4 equipos (`DOE`, `Dirección`, `Secretaría`, `Académico`)
+- proyectos activos reales del colegio
+- eventos del mes (entregas, reuniones directivas, feriados)
+- responsables de cada proyecto
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+> Con eso ya puedes reemplazar `runtime-store.json` por Neon sin cambiar el contrato de APIs.
