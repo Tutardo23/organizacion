@@ -4,8 +4,7 @@ import {
   ChartLineUp, 
   DownloadSimple, 
   FunnelSimple, 
-  TrendUp,
-  UsersThree
+  TrendUp
 } from "@phosphor-icons/react/dist/ssr";
 import { PageHeader, MetricCard, ToneBadge, ProgressBar } from "../components/ui";
 import { metrics, teams } from "../data";
@@ -72,7 +71,7 @@ export default function IndicadoresPage() {
                   </div>
                   <span className="text-sm font-extrabold text-slate-900">{team.documents} doc.</span>
                 </div>
-                <ProgressBar value={Math.min((team.documents / 150) * 100, 100)} tone={team.color as any} />
+                <ProgressBar value={Math.min((team.documents / 150) * 100, 100)} tone={team.color === "emerald" ? "emerald" : team.color === "orange" ? "orange" : team.color === "blue" ? "blue" : "slate"} />
               </div>
             ))}
           </div>

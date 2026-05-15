@@ -4,12 +4,13 @@ import {
   CaretLeft, 
   CaretRight, 
   Plus, 
-  FunnelSimple,
-  CalendarCheck
+  FunnelSimple
 } from "@phosphor-icons/react/dist/ssr";
 import { PageHeader } from "../components/ui";
+import { useProfile } from "../components/ProfileContext";
 
 export default function CalendarioPage() {
+  const { visibleTeam, profile, visibleProjects } = useProfile();
   const daysOfWeek = ['Lunes', 'Martes', 'Miércoles', 'Jueves', 'Viernes', 'Sábado', 'Domingo'];
   
   // Generamos un array de 35 días para simular una grilla de mes completo
@@ -24,7 +25,7 @@ export default function CalendarioPage() {
       <PageHeader
         eyebrow="Agenda Global"
         title="Calendario Institucional"
-        description="Visión unificada de entregas de proyectos, reuniones de equipo, jornadas docentes y feriados escolares."
+        description={`Agenda del perfil ${profile}: entregas y reuniones para ${visibleTeam}.`}
       >
         <button className="flex h-10 items-center gap-2 rounded-lg border border-slate-200 bg-white px-4 text-sm font-bold text-slate-700 shadow-sm transition hover:border-blue-200 hover:text-blue-700">
           <FunnelSimple size={18} weight="bold" />
@@ -86,10 +87,10 @@ export default function CalendarioPage() {
                     
                     <div className="mt-2 flex flex-col gap-1.5">
                       {/* Simulando eventos clave */}
-                      {day.dayNumber === 8 && (
+                      {visibleProjects.some((p) => parseInt(p.due.split(" ")[0]) === day.dayNumber) && (
                         <div className="rounded-md border border-blue-100 bg-blue-50 px-2 py-1.5 shadow-sm cursor-pointer hover:border-blue-300 transition">
                           <p className="text-[10px] font-bold uppercase tracking-wide text-blue-500">10:00 AM</p>
-                          <p className="text-xs font-bold leading-tight text-blue-800">Entrega Seguimiento 3A (DOE)</p>
+                          <p className="text-xs font-bold leading-tight text-blue-800">Entrega proyecto del equipo</p>
                         </div>
                       )}
                       {day.dayNumber === 10 && (

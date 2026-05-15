@@ -22,6 +22,7 @@ import {
 } from "@phosphor-icons/react/dist/ssr";
 import type { ProjectStatus } from "../data";
 import { projects, teams, staff, activity } from "../data";
+import { useProfile } from "../components/ProfileContext";
 import { PageHeader, ProgressBar, ToneBadge } from "../components/ui";
 
 const columns: ProjectStatus[] = ["Por hacer", "En curso", "En revisión", "Finalizado"];
@@ -41,6 +42,7 @@ const riskTone = {
 
 export default function ProjectsPage() {
   const [view, setView] = useState<"board" | "calendar">("board");
+  const { visibleProjects, visibleTeam, profile } = useProfile();
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [selectedProject, setSelectedProject] = useState<typeof projects[0] | null>(null);
   const [isSyncing, setIsSyncing] = useState(false);
@@ -55,7 +57,7 @@ export default function ProjectsPage() {
       <PageHeader
         eyebrow="Flujo de trabajo"
         title="Proyectos, cargas y validaciones"
-        description="Vista operativa para entender dónde está cada iniciativa, qué documentación tiene, quién responde y qué decisión falta."
+        description={`Vista operativa del perfil ${profile}. Proyectos visibles para ${visibleTeam}.`}
       >
         <div className="flex items-center rounded-lg border border-slate-200 bg-white p-1 shadow-sm">
           <button 
@@ -125,7 +127,7 @@ export default function ProjectsPage() {
       {view === "board" ? (
         <section className="flex flex-1 gap-5 overflow-x-auto pb-4">
           {columns.map((column) => {
-            const columnProjects = projects.filter((project) => project.status === column);
+            const columnProjects = visibleProjects.filter((project) => project.status === column);
             return (
               <div key={column} className="flex w-[340px] shrink-0 flex-col">
                 <div className="mb-3 flex items-center justify-between px-1">
@@ -236,7 +238,7 @@ export default function ProjectsPage() {
                 <div key={d} className="bg-slate-50 p-4 text-center text-xs font-bold uppercase tracking-widest text-slate-500 border-r border-b border-slate-100">{d}</div>
               ))}
               {Array.from({ length: 31 }).map((_, i) => {
-                const dayProjects = projects.filter(p => parseInt(p.due.split(" ")[0]) === i + 1);
+                const dayProjects = visibleProjects.filter(p => parseInt(p.due.split(" ")[0]) === i + 1);
                 return (
                   <div key={i} className="min-h-[140px] p-2 border-r border-b border-slate-100 transition hover:bg-slate-50/50">
                     <span className="text-sm font-extrabold text-slate-400 ml-2 mt-1 block">{i + 1}</span>

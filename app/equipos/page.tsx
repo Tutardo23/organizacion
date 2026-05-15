@@ -177,7 +177,7 @@ export default function TeamsPage() {
                 </tr>
               </thead>
               <tbody className="divide-y divide-slate-100 text-sm">
-                {staff.map((person) => (
+                {filteredStaff.map((person) => (
                   <tr key={person.name} className="transition hover:bg-slate-50">
                     <td className="px-5 py-4">
                       <div className="flex items-center gap-3">
