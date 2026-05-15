@@ -1,3 +1,5 @@
+"use client";
+
 import {
   ArrowRight,
   Briefcase,
@@ -11,6 +13,7 @@ import {
 } from "@phosphor-icons/react/dist/ssr";
 import { projects, staff, teams } from "../data";
 import { PageHeader, ProgressBar, ToneBadge } from "../components/ui";
+import { useProfile } from "../components/ProfileContext";
 
 const teamTone = {
   doe: "indigo",
@@ -20,12 +23,16 @@ const teamTone = {
 } as const;
 
 export default function TeamsPage() {
+  const { visibleTeam, profile } = useProfile();
+  const filteredTeams = teams.filter((team) => team.shortName === visibleTeam);
+  const filteredStaff = staff.filter((person) => person.team === visibleTeam);
+  const filteredProjects = projects.filter((project) => project.team === visibleTeam);
   return (
     <div className="mx-auto max-w-[1600px] space-y-8 pb-10">
       <PageHeader
         eyebrow="Mapa de responsabilidades"
         title="Equipos, referentes y carga de trabajo"
-        description="Un directorio vivo para saber quién lidera cada área, qué proyectos tiene abiertos y dónde conviene reforzar seguimiento."
+        description={`Vista por perfil ${profile}: responsables, carga y personal de ${visibleTeam}.`}
       >
         <button className="flex h-10 items-center gap-2 rounded-lg border border-slate-200 bg-white px-4 text-sm font-bold text-slate-700 shadow-sm transition hover:border-blue-200 hover:text-blue-700">
           <Export size={18} weight="bold" />
@@ -49,21 +56,21 @@ export default function TeamsPage() {
         <div className="grid grid-cols-3 gap-3 sm:w-[480px]">
           <div className="rounded-lg border border-slate-200 bg-white p-3 shadow-sm">
             <p className="text-xs font-bold uppercase tracking-wide text-slate-400">Equipos</p>
-            <p className="mt-1 text-xl font-extrabold text-slate-950">{teams.length}</p>
+            <p className="mt-1 text-xl font-extrabold text-slate-950">{filteredTeams.length}</p>
           </div>
           <div className="rounded-lg border border-slate-200 bg-white p-3 shadow-sm">
             <p className="text-xs font-bold uppercase tracking-wide text-slate-400">Personas</p>
-            <p className="mt-1 text-xl font-extrabold text-slate-950">{staff.length}</p>
+            <p className="mt-1 text-xl font-extrabold text-slate-950">{filteredStaff.length}</p>
           </div>
           <div className="rounded-lg border border-slate-200 bg-white p-3 shadow-sm">
             <p className="text-xs font-bold uppercase tracking-wide text-slate-400">Activos</p>
-            <p className="mt-1 text-xl font-extrabold text-blue-700">{projects.filter((project) => project.status !== "Finalizado").length}</p>
+            <p className="mt-1 text-xl font-extrabold text-blue-700">{filteredProjects.filter((project) => project.status !== "Finalizado").length}</p>
           </div>
         </div>
       </section>
 
       <section className="grid grid-cols-1 gap-5 xl:grid-cols-4">
-        {teams.map((team) => {
+        {filteredTeams.map((team) => {
           const Icon = team.icon;
           const completion = Math.min(96, 52 + team.documents / 2);
           return (
