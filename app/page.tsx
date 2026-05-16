@@ -1,3 +1,5 @@
+"use client";
+
 import {
   ArrowRight,
   CalendarBlank,
@@ -10,6 +12,7 @@ import {
   Users,
 } from "@phosphor-icons/react/dist/ssr";
 import { activity, institutionalPriorities, metrics, projects, teams } from "./data";
+import { useProfile } from "./components/ProfileContext";
 import { MetricCard, PageHeader, ProgressBar, ToneBadge } from "./components/ui";
 
 const urgentProjects = projects
@@ -31,6 +34,8 @@ const riskTone = {
 } as const;
 
 export default function Dashboard() {
+  const { profile } = useProfile();
+
   return (
     <div className="mx-auto max-w-[1600px] space-y-8 pb-10">
       <PageHeader
@@ -49,6 +54,7 @@ export default function Dashboard() {
       </PageHeader>
 
       <section className="grid grid-cols-1 gap-4 lg:grid-cols-4">
+        <p className="col-span-full text-xs font-bold uppercase tracking-wider text-slate-500">Perfil activo: {profile}</p>
         {metrics.map((metric) => (
           <MetricCard key={metric.label} {...metric} />
         ))}

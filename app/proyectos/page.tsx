@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import {
   CalendarBlank,
   ChatCircleText,
@@ -22,6 +22,7 @@ import {
 } from "@phosphor-icons/react/dist/ssr";
 import type { ProjectStatus } from "../data";
 import { projects, teams, staff, activity } from "../data";
+import { useProfile } from "../components/ProfileContext";
 import { PageHeader, ProgressBar, ToneBadge } from "../components/ui";
 
 const columns: ProjectStatus[] = ["Por hacer", "En curso", "En revisión", "Finalizado"];
@@ -41,9 +42,28 @@ const riskTone = {
 
 export default function ProjectsPage() {
   const [view, setView] = useState<"board" | "calendar">("board");
+  const { visibleProjects, visibleTeam, profile } = useProfile();
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [search, setSearch] = useState("");
+  const [apiProjects, setApiProjects] = useState<typeof projects>([]);
+  const [loadingProjects, setLoadingProjects] = useState(false);
   const [selectedProject, setSelectedProject] = useState<typeof projects[0] | null>(null);
   const [isSyncing, setIsSyncing] = useState(false);
+
+
+  useEffect(() => {
+    const run = async () => {
+      setLoadingProjects(true);
+      const params = new URLSearchParams({ profile, q: search });
+      const response = await fetch(`/api/projects?${params.toString()}`);
+      const data = await response.json();
+      setApiProjects(data.projects ?? []);
+      setLoadingProjects(false);
+    };
+    run();
+  }, [profile, search]);
+
+  const displayedProjects = useMemo(() => (apiProjects.length ? apiProjects : visibleProjects), [apiProjects, visibleProjects]);
 
   const handleSyncCalendar = () => {
     setIsSyncing(true);
@@ -55,7 +75,7 @@ export default function ProjectsPage() {
       <PageHeader
         eyebrow="Flujo de trabajo"
         title="Proyectos, cargas y validaciones"
-        description="Vista operativa para entender dónde está cada iniciativa, qué documentación tiene, quién responde y qué decisión falta."
+        description={`Vista operativa del perfil ${profile}. Proyectos visibles para ${visibleTeam}.`}
       >
         <div className="flex items-center rounded-lg border border-slate-200 bg-white p-1 shadow-sm">
           <button 
@@ -101,6 +121,8 @@ export default function ProjectsPage() {
         <div className="relative">
           <MagnifyingGlass size={18} className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" />
           <input
+            value={search}
+            onChange={(event) => setSearch(event.target.value)}
             type="search"
             placeholder="Buscar por proyecto, equipo, responsable o próxima acción..."
             className="h-11 w-full rounded-lg border border-slate-200 bg-white pl-10 pr-4 text-sm font-medium text-slate-700 shadow-sm outline-none transition focus:border-blue-300 focus:ring-2 focus:ring-blue-100"
@@ -109,23 +131,23 @@ export default function ProjectsPage() {
         <div className="grid grid-cols-3 gap-3 sm:w-[520px]">
           <div className="rounded-lg border border-slate-200 bg-white p-3 shadow-sm">
             <p className="text-xs font-bold uppercase tracking-wide text-slate-400">A tiempo</p>
-            <p className="mt-1 text-xl font-extrabold text-emerald-600">8</p>
+            <p className="mt-1 text-xl font-extrabold text-emerald-600">{displayedProjects.filter((p) => p.status !== "Finalizado" && p.risk === "Normal").length}</p>
           </div>
           <div className="rounded-lg border border-slate-200 bg-white p-3 shadow-sm">
             <p className="text-xs font-bold uppercase tracking-wide text-slate-400">En alerta</p>
-            <p className="mt-1 text-xl font-extrabold text-orange-600">3</p>
+            <p className="mt-1 text-xl font-extrabold text-orange-600">{displayedProjects.filter((p) => p.risk === "Atención").length}</p>
           </div>
           <div className="rounded-lg border border-slate-200 bg-white p-3 shadow-sm">
             <p className="text-xs font-bold uppercase tracking-wide text-slate-400">Bloqueados</p>
-            <p className="mt-1 text-xl font-extrabold text-rose-600">1</p>
+            <p className="mt-1 text-xl font-extrabold text-rose-600">{displayedProjects.filter((p) => p.risk === "Crítico").length}</p>
           </div>
         </div>
       </section>
 
-      {view === "board" ? (
+      {loadingProjects ? <p className="text-sm font-bold text-slate-500">Cargando proyectos...</p> : view === "board" ? (
         <section className="flex flex-1 gap-5 overflow-x-auto pb-4">
           {columns.map((column) => {
-            const columnProjects = projects.filter((project) => project.status === column);
+            const columnProjects = displayedProjects.filter((project) => project.status === column);
             return (
               <div key={column} className="flex w-[340px] shrink-0 flex-col">
                 <div className="mb-3 flex items-center justify-between px-1">
@@ -152,6 +174,12 @@ export default function ProjectsPage() {
                 </div>
 
                 <div className="flex flex-col gap-4">
+                {columnProjects.length === 0 ? (
+                  <div className="rounded-xl border border-dashed border-slate-200 bg-slate-50 p-5 text-sm font-semibold text-slate-500">
+                    Sin proyectos en esta etapa para el perfil seleccionado.
+                  </div>
+                ) : null}
+
                   {columnProjects.map((project) => (
                     <article
                       key={project.id}
@@ -191,7 +219,7 @@ export default function ProjectsPage() {
                       <div className="mt-5 flex items-center justify-between border-t border-slate-100 pt-4">
                         <div className="flex items-center gap-2 text-xs font-bold text-slate-500">
                           {project.status === "Finalizado" ? <CheckCircle size={16} weight="fill" className="text-emerald-500" /> : <Clock size={16} weight="bold" className="text-orange-500" />}
-                          {project.status === "Finalizado" ? `Completado ${project.due}` : `${project.daysLeft} días`}
+                          {project.status === "Finalizado" ? `Completado` : `${project.daysLeft ?? "-"} días`}
                         </div>
                         <div className="flex items-center gap-3 text-xs font-bold text-slate-500">
                           <span className="flex items-center gap-1">
@@ -218,7 +246,7 @@ export default function ProjectsPage() {
         /* VISTA CALENDARIO - Estética Amplia y Limpia */
         <section className="flex-1 rounded-xl border border-slate-200 bg-white p-6 shadow-sm overflow-hidden flex flex-col">
           <div className="flex items-center justify-between mb-8">
-            <h2 className="text-2xl font-bold tracking-tight text-slate-950">Mayo 2026</h2>
+            <h2 className="text-2xl font-bold tracking-tight text-slate-950">Calendario de entregas</h2>
             <div className="flex items-center gap-4">
                <div className="flex items-center gap-3 mr-4">
                  <span className="flex items-center gap-2 text-sm font-bold text-slate-500"><div className="h-3 w-3 rounded-full bg-blue-500"/> En curso</span>
@@ -236,7 +264,7 @@ export default function ProjectsPage() {
                 <div key={d} className="bg-slate-50 p-4 text-center text-xs font-bold uppercase tracking-widest text-slate-500 border-r border-b border-slate-100">{d}</div>
               ))}
               {Array.from({ length: 31 }).map((_, i) => {
-                const dayProjects = projects.filter(p => parseInt(p.due.split(" ")[0]) === i + 1);
+                const dayProjects = displayedProjects.filter(p => parseInt((p.due ?? "0").split(" ")[0]) === i + 1 || Number((p as { dueDate?: string }).dueDate?.slice(8,10)) === i + 1);
                 return (
                   <div key={i} className="min-h-[140px] p-2 border-r border-b border-slate-100 transition hover:bg-slate-50/50">
                     <span className="text-sm font-extrabold text-slate-400 ml-2 mt-1 block">{i + 1}</span>

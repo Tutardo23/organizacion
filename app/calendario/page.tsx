@@ -1,30 +1,21 @@
 "use client";
 
-import { 
-  CaretLeft, 
-  CaretRight, 
-  Plus, 
-  FunnelSimple,
-  CalendarCheck
-} from "@phosphor-icons/react/dist/ssr";
+import { Plus, FunnelSimple } from "@phosphor-icons/react/dist/ssr";
 import { PageHeader } from "../components/ui";
+import { useProfile } from "../components/ProfileContext";
 
 export default function CalendarioPage() {
+  const { visibleTeam, profile, visibleProjects } = useProfile();
   const daysOfWeek = ['Lunes', 'Martes', 'Miércoles', 'Jueves', 'Viernes', 'Sábado', 'Domingo'];
-  
-  // Generamos un array de 35 días para simular una grilla de mes completo
-  const days = Array.from({ length: 35 }).map((_, i) => {
-    const dayNumber = i - 2; // Desfasaje para que empiece un miércoles (ejemplo)
-    const isCurrentMonth = dayNumber > 0 && dayNumber <= 31;
-    return { dayNumber, isCurrentMonth };
-  });
+
+  const monthDays = Array.from({ length: 31 }, (_, idx) => idx + 1);
 
   return (
     <div className="mx-auto flex h-full max-w-[1600px] flex-col gap-6 pb-8">
       <PageHeader
         eyebrow="Agenda Global"
         title="Calendario Institucional"
-        description="Visión unificada de entregas de proyectos, reuniones de equipo, jornadas docentes y feriados escolares."
+        description={`Agenda del perfil ${profile}: entregas y reuniones para ${visibleTeam}.`}
       >
         <button className="flex h-10 items-center gap-2 rounded-lg border border-slate-200 bg-white px-4 text-sm font-bold text-slate-700 shadow-sm transition hover:border-blue-200 hover:text-blue-700">
           <FunnelSimple size={18} weight="bold" />
@@ -40,18 +31,8 @@ export default function CalendarioPage() {
         {/* Cabecera del Calendario */}
         <div className="flex items-center justify-between border-b border-slate-100 px-6 py-4">
           <div className="flex items-center gap-4">
-            <h2 className="text-xl font-extrabold tracking-tight text-slate-950">Mayo 2026</h2>
-            <div className="flex items-center gap-1">
-              <button className="grid h-8 w-8 place-items-center rounded-md border border-slate-200 text-slate-500 transition hover:bg-slate-50 hover:text-slate-900">
-                <CaretLeft size={16} weight="bold" />
-              </button>
-              <button className="px-3 py-1 text-sm font-bold text-slate-600 transition hover:text-slate-900">
-                Hoy
-              </button>
-              <button className="grid h-8 w-8 place-items-center rounded-md border border-slate-200 text-slate-500 transition hover:bg-slate-50 hover:text-slate-900">
-                <CaretRight size={16} weight="bold" />
-              </button>
-            </div>
+            <h2 className="text-xl font-extrabold tracking-tight text-slate-950">Calendario operativo ({visibleTeam})</h2>
+            <div className="text-xs font-bold uppercase tracking-wider text-slate-400">Datos cargados por tu equipo</div>
           </div>
           
           {/* Leyenda */}
@@ -73,43 +54,27 @@ export default function CalendarioPage() {
           </div>
           
           <div className="grid flex-1 grid-cols-7 grid-rows-5">
-            {days.map((day, idx) => (
-              <div 
-                key={idx} 
-                className={`min-h-[120px] border-b border-r border-slate-200 p-2 transition hover:bg-slate-50/80 ${day.isCurrentMonth ? 'bg-white' : 'bg-slate-50/50'}`}
+            {monthDays.map((dayNumber) => {
+              const hasProject = visibleProjects.some((p) => {
+                const fromDue = Number((p.due ?? "0").split(" ")[0]);
+                const fromIso = Number((p as { dueDate?: string }).dueDate?.slice(8, 10));
+                return fromDue === dayNumber || fromIso === dayNumber;
+              });
+              return (
+              <div
+                key={dayNumber}
+                className="min-h-[110px] border-b border-r border-slate-200 bg-white p-2 transition hover:bg-slate-50/80"
               >
-                {day.dayNumber > 0 && day.dayNumber <= 31 ? (
-                  <>
-                    <span className={`block text-sm font-extrabold ${day.dayNumber === 5 ? 'flex h-6 w-6 items-center justify-center rounded-full bg-blue-600 text-white' : 'text-slate-400'}`}>
-                      {day.dayNumber}
-                    </span>
-                    
-                    <div className="mt-2 flex flex-col gap-1.5">
-                      {/* Simulando eventos clave */}
-                      {day.dayNumber === 8 && (
-                        <div className="rounded-md border border-blue-100 bg-blue-50 px-2 py-1.5 shadow-sm cursor-pointer hover:border-blue-300 transition">
-                          <p className="text-[10px] font-bold uppercase tracking-wide text-blue-500">10:00 AM</p>
-                          <p className="text-xs font-bold leading-tight text-blue-800">Entrega Seguimiento 3A (DOE)</p>
-                        </div>
-                      )}
-                      {day.dayNumber === 10 && (
-                        <div className="rounded-md border border-emerald-100 bg-emerald-50 px-2 py-1.5 shadow-sm cursor-pointer hover:border-emerald-300 transition">
-                          <p className="text-[10px] font-bold uppercase tracking-wide text-emerald-500">14:30 PM</p>
-                          <p className="text-xs font-bold leading-tight text-emerald-800">Reunión Articulación Directiva</p>
-                        </div>
-                      )}
-                      {day.dayNumber === 25 && (
-                        <div className="rounded-md border border-rose-100 bg-rose-50 px-2 py-1.5 shadow-sm">
-                          <p className="text-[10px] font-bold uppercase tracking-wide text-rose-500">Todo el día</p>
-                          <p className="text-xs font-bold leading-tight text-rose-800">Feriado Nacional (25 de Mayo)</p>
-                        </div>
-                      )}
+                <span className="block text-sm font-extrabold text-slate-400">{dayNumber}</span>
+                <div className="mt-2 flex flex-col gap-1.5">
+                  {hasProject ? (
+                    <div className="rounded-md border border-blue-100 bg-blue-50 px-2 py-1.5 text-xs font-bold text-blue-800">
+                      Entregas del equipo
                     </div>
-                  </>
-                ) : null}
+                  ) : null}
+                </div>
               </div>
-            ))}
-          </div>
+            );})}          </div>
         </div>
       </section>
     </div>

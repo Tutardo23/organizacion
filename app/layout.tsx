@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import Sidebar from "./components/Sidebar";
 import Header from "./components/Header";
+import { ProfileProvider } from "./components/ProfileContext";
 import "./globals.css";
 
 export const metadata: Metadata = {
@@ -16,6 +17,7 @@ export default function RootLayout({
   return (
     <html lang="es">
       <body className="flex h-screen overflow-hidden bg-slate-50 text-slate-950 antialiased">
+        <ProfileProvider>
         <Sidebar />
 
         <main className="relative flex min-w-0 flex-1 flex-col overflow-hidden">
@@ -27,6 +29,7 @@ export default function RootLayout({
             {children}
           </div>
         </main>
+        </ProfileProvider>
       </body>
     </html>
   );

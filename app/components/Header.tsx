@@ -16,10 +16,10 @@ import {
   Plus,
   Users,
   X,
-  FileText,
   CheckCircle
 } from "@phosphor-icons/react/dist/ssr";
 import { projects } from "../data";
+import { roleProfiles, useProfile } from "./ProfileContext";
 
 const navItems = [
   { name: "Panel", href: "/", icon: House, badge: null },
@@ -35,6 +35,7 @@ const secondaryItems = [
 export default function Header() {
   const pathname = usePathname();
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const { profile, setProfile } = useProfile();
   const [isUploadOpen, setIsUploadOpen] = useState(false);
   const [uploadState, setUploadState] = useState<"idle" | "uploading" | "success">("idle");
 
@@ -85,6 +86,17 @@ export default function Header() {
             <span className="hidden sm:block">Cargar informe</span>
           </button>
           
+                    <select
+            value={profile}
+            onChange={(event) => setProfile(event.target.value as "Secretaría" | "Dirección" | "DOE" | "Académico")}
+            className="h-10 rounded-lg border border-slate-200 bg-white px-3 text-xs font-bold text-slate-700 shadow-sm outline-none transition hover:border-blue-200"
+            aria-label="Perfil activo"
+          >
+            {roleProfiles.map((role) => (
+              <option key={role} value={role}>{role}</option>
+            ))}
+          </select>
+
           <button className="relative grid h-10 w-10 place-items-center rounded-lg border border-slate-200 bg-white text-slate-500 shadow-sm transition hover:border-blue-200 hover:text-blue-700">
             <Bell size={20} weight="bold" />
             <span className="absolute right-2.5 top-2.5 h-2 w-2 rounded-full border-2 border-white bg-rose-500" />
@@ -93,8 +105,8 @@ export default function Header() {
           <div className="hidden h-10 items-center gap-3 rounded-lg border border-slate-200 bg-white px-2.5 shadow-sm md:flex">
             <div className="grid h-7 w-7 place-items-center rounded-md bg-slate-950 text-xs font-extrabold text-white">S</div>
             <div className="leading-tight">
-              <p className="text-xs font-bold text-slate-900">Secretaría</p>
-              <p className="text-[10px] font-bold uppercase tracking-widest text-slate-400">Admin</p>
+              <p className="text-xs font-bold text-slate-900">{profile}</p>
+              <p className="text-[10px] font-bold uppercase tracking-widest text-slate-400">Perfil</p>
             </div>
           </div>
         </div>
