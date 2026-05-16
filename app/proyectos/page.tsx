@@ -131,15 +131,15 @@ export default function ProjectsPage() {
         <div className="grid grid-cols-3 gap-3 sm:w-[520px]">
           <div className="rounded-lg border border-slate-200 bg-white p-3 shadow-sm">
             <p className="text-xs font-bold uppercase tracking-wide text-slate-400">A tiempo</p>
-            <p className="mt-1 text-xl font-extrabold text-emerald-600">8</p>
+            <p className="mt-1 text-xl font-extrabold text-emerald-600">{displayedProjects.filter((p) => p.status !== "Finalizado" && p.risk === "Normal").length}</p>
           </div>
           <div className="rounded-lg border border-slate-200 bg-white p-3 shadow-sm">
             <p className="text-xs font-bold uppercase tracking-wide text-slate-400">En alerta</p>
-            <p className="mt-1 text-xl font-extrabold text-orange-600">3</p>
+            <p className="mt-1 text-xl font-extrabold text-orange-600">{displayedProjects.filter((p) => p.risk === "Atención").length}</p>
           </div>
           <div className="rounded-lg border border-slate-200 bg-white p-3 shadow-sm">
             <p className="text-xs font-bold uppercase tracking-wide text-slate-400">Bloqueados</p>
-            <p className="mt-1 text-xl font-extrabold text-rose-600">1</p>
+            <p className="mt-1 text-xl font-extrabold text-rose-600">{displayedProjects.filter((p) => p.risk === "Crítico").length}</p>
           </div>
         </div>
       </section>
@@ -174,6 +174,12 @@ export default function ProjectsPage() {
                 </div>
 
                 <div className="flex flex-col gap-4">
+                {columnProjects.length === 0 ? (
+                  <div className="rounded-xl border border-dashed border-slate-200 bg-slate-50 p-5 text-sm font-semibold text-slate-500">
+                    Sin proyectos en esta etapa para el perfil seleccionado.
+                  </div>
+                ) : null}
+
                   {columnProjects.map((project) => (
                     <article
                       key={project.id}
@@ -213,7 +219,7 @@ export default function ProjectsPage() {
                       <div className="mt-5 flex items-center justify-between border-t border-slate-100 pt-4">
                         <div className="flex items-center gap-2 text-xs font-bold text-slate-500">
                           {project.status === "Finalizado" ? <CheckCircle size={16} weight="fill" className="text-emerald-500" /> : <Clock size={16} weight="bold" className="text-orange-500" />}
-                          {project.status === "Finalizado" ? `Completado ${project.due}` : `${project.daysLeft} días`}
+                          {project.status === "Finalizado" ? `Completado` : `${project.daysLeft ?? "-"} días`}
                         </div>
                         <div className="flex items-center gap-3 text-xs font-bold text-slate-500">
                           <span className="flex items-center gap-1">
@@ -240,7 +246,7 @@ export default function ProjectsPage() {
         /* VISTA CALENDARIO - Estética Amplia y Limpia */
         <section className="flex-1 rounded-xl border border-slate-200 bg-white p-6 shadow-sm overflow-hidden flex flex-col">
           <div className="flex items-center justify-between mb-8">
-            <h2 className="text-2xl font-bold tracking-tight text-slate-950">Mayo 2026</h2>
+            <h2 className="text-2xl font-bold tracking-tight text-slate-950">Calendario de entregas</h2>
             <div className="flex items-center gap-4">
                <div className="flex items-center gap-3 mr-4">
                  <span className="flex items-center gap-2 text-sm font-bold text-slate-500"><div className="h-3 w-3 rounded-full bg-blue-500"/> En curso</span>
