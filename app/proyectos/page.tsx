@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import {
   CalendarBlank,
   ChatCircleText,
@@ -44,8 +44,26 @@ export default function ProjectsPage() {
   const [view, setView] = useState<"board" | "calendar">("board");
   const { visibleProjects, visibleTeam, profile } = useProfile();
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [search, setSearch] = useState("");
+  const [apiProjects, setApiProjects] = useState<typeof projects>([]);
+  const [loadingProjects, setLoadingProjects] = useState(false);
   const [selectedProject, setSelectedProject] = useState<typeof projects[0] | null>(null);
   const [isSyncing, setIsSyncing] = useState(false);
+
+
+  useEffect(() => {
+    const run = async () => {
+      setLoadingProjects(true);
+      const params = new URLSearchParams({ profile, q: search });
+      const response = await fetch(`/api/projects?${params.toString()}`);
+      const data = await response.json();
+      setApiProjects(data.projects ?? []);
+      setLoadingProjects(false);
+    };
+    run();
+  }, [profile, search]);
+
+  const displayedProjects = useMemo(() => (apiProjects.length ? apiProjects : visibleProjects), [apiProjects, visibleProjects]);
 
   const handleSyncCalendar = () => {
     setIsSyncing(true);
@@ -103,6 +121,8 @@ export default function ProjectsPage() {
         <div className="relative">
           <MagnifyingGlass size={18} className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" />
           <input
+            value={search}
+            onChange={(event) => setSearch(event.target.value)}
             type="search"
             placeholder="Buscar por proyecto, equipo, responsable o próxima acción..."
             className="h-11 w-full rounded-lg border border-slate-200 bg-white pl-10 pr-4 text-sm font-medium text-slate-700 shadow-sm outline-none transition focus:border-blue-300 focus:ring-2 focus:ring-blue-100"
@@ -124,10 +144,10 @@ export default function ProjectsPage() {
         </div>
       </section>
 
-      {view === "board" ? (
+      {loadingProjects ? <p className="text-sm font-bold text-slate-500">Cargando proyectos...</p> : view === "board" ? (
         <section className="flex flex-1 gap-5 overflow-x-auto pb-4">
           {columns.map((column) => {
-            const columnProjects = visibleProjects.filter((project) => project.status === column);
+            const columnProjects = displayedProjects.filter((project) => project.status === column);
             return (
               <div key={column} className="flex w-[340px] shrink-0 flex-col">
                 <div className="mb-3 flex items-center justify-between px-1">
@@ -238,7 +258,7 @@ export default function ProjectsPage() {
                 <div key={d} className="bg-slate-50 p-4 text-center text-xs font-bold uppercase tracking-widest text-slate-500 border-r border-b border-slate-100">{d}</div>
               ))}
               {Array.from({ length: 31 }).map((_, i) => {
-                const dayProjects = visibleProjects.filter(p => parseInt(p.due.split(" ")[0]) === i + 1);
+                const dayProjects = displayedProjects.filter(p => parseInt((p.due ?? "0").split(" ")[0]) === i + 1 || Number((p as { dueDate?: string }).dueDate?.slice(8,10)) === i + 1);
                 return (
                   <div key={i} className="min-h-[140px] p-2 border-r border-b border-slate-100 transition hover:bg-slate-50/50">
                     <span className="text-sm font-extrabold text-slate-400 ml-2 mt-1 block">{i + 1}</span>
